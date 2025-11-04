@@ -6,7 +6,6 @@ coverage/
 .vscode/
 npm-debug.log*
 pnpm-lock.yaml
-package-lock.json
 yarn.lock
 *.log
 *.local

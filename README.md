@@ -1,7 +1,8 @@
-(The file `c:\Users\gorho\Frontend Development\exchange-rates-component\README.md` exists, but is empty)
 # Exchange Rates Component
 
 A small React + TypeScript component that displays historical exchange rates in a table. It uses Vite for bundling, Redux Toolkit for state, and Jest + Testing Library for tests.
+
+🌐 [Live Demo](https://gorhorvat.github.io/exchange-rates-component/)
 
 ## Libraries used
 
@@ -71,6 +72,23 @@ npm run test:coverage
 ```
 
 Coverage output will be written to the `coverage/` folder.
+
+## Deployment
+
+The app is automatically deployed to GitHub Pages when changes are pushed to the `main` branch. You can also deploy manually:
+
+```powershell
+npm run deploy
+```
+
+This will:
+1. Build the project
+2. Deploy to GitHub Pages
+3. Make it available at https://gorhorvat.github.io/exchange-rates-component/
+
+To deploy locally:
+1. Install gh-pages if not already installed: `npm install --save-dev gh-pages`
+2. Run the deploy script: `npm run deploy`
 
 ## Notes
 

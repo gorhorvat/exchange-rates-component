@@ -57,7 +57,38 @@ describe('CurrencySelector', () => {
     });
   });
 
-  it('allows deleting a currency chip', async () => {
+  it('allows deleting a currency chip when above minimum', async () => {
+    const onChangeMock = jest.fn();
+    const user = userEvent.setup();
+
+    render(
+      <CurrencySelector
+        selectedCurrencies={['USD', 'EUR', 'JPY', 'CAD']}
+        onCurrenciesChange={onChangeMock}
+        baseCurrency="GBP"
+        minCurrencies={3}
+      />
+    );
+
+    // Wait for chips to be rendered
+    await waitFor(() => {
+      expect(screen.getByText('USD')).toBeInTheDocument();
+    });
+
+    // Find all delete icons
+    const deleteIcons = screen.getAllByTestId('CancelIcon');
+    expect(deleteIcons.length).toBeGreaterThan(0);
+    
+    // Click the first delete icon (USD chip)
+    await user.click(deleteIcons[0]);
+    
+    // Verify onCurrenciesChange was called with USD removed (covers lines 35-36)
+    await waitFor(() => {
+      expect(onChangeMock).toHaveBeenCalledWith(['EUR', 'JPY', 'CAD']);
+    });
+  });
+
+  it('chips have onMouseDown handler to stop propagation', async () => {
     const onChangeMock = jest.fn();
 
     render(
@@ -69,19 +100,30 @@ describe('CurrencySelector', () => {
       />
     );
 
-    // Wait for chips to be rendered
     await waitFor(() => {
       expect(screen.getByText('USD')).toBeInTheDocument();
     });
 
-    // Simply verify that chips are rendered with delete functionality
-    // The actual delete button is hard to test due to MUI internals
-    // Instead, verify the chips exist and have the structure for deletion
-    const usdChip = screen.getByText('USD');
-    expect(usdChip).toBeInTheDocument();
+    // This test verifies the structure includes onMouseDown
+    // The actual stopPropagation behavior is tested by the chips rendering correctly
+    const chips = screen.getAllByRole('button').filter(btn => 
+      btn.classList.contains('MuiChip-root')
+    );
+    
+    expect(chips.length).toBe(3);
+    
+    // Dispatch mousedown event on first chip
+    const stopPropagationSpy = jest.fn();
+    const mouseDownEvent = new MouseEvent('mousedown', { bubbles: true, cancelable: true });
+    Object.defineProperty(mouseDownEvent, 'stopPropagation', {
+      value: stopPropagationSpy,
+      writable: false
+    });
 
-    // Verify the onChangeMock exists and is ready to be called
-    expect(typeof onChangeMock).toBe('function');
+    chips[0].dispatchEvent(mouseDownEvent);
+    
+    // Verify the event handler exists (covers line 62)
+    expect(stopPropagationSpy).toHaveBeenCalled();
   });
 
 

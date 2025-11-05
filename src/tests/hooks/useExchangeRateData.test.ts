@@ -86,4 +86,96 @@ describe('useExchangeRateData', () => {
 
     expect(result.current.tableData.length).toBe(0);
   });
+
+  it('handles no data available (all null results)', async () => {
+    // Mock fetchExchangeRatesForDates to return all null rates
+    mockedAxios.get.mockResolvedValue({
+      data: { gbp: null },
+    });
+
+    const { result } = renderHook(() =>
+      useExchangeRateData({
+        baseCurrency: 'GBP',
+        targetCurrencies: ['USD', 'EUR'],
+        selectedDate: new Date('2025-11-04'),
+      })
+    );
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    // When no data is available, tableData should be empty
+    expect(result.current.tableData.length).toBe(0);
+  });
+
+  it('handles null rates for specific dates', async () => {
+    // Mock 404 responses for some dates (which will return null from fetchExchangeRates)
+    const axiosError = {
+      message: 'Request failed with status code 404',
+      response: {
+        status: 404,
+      },
+    };
+    
+    mockedAxios.get
+      .mockResolvedValueOnce({
+        data: { gbp: mockRates }, // First date has rates
+      })
+      .mockRejectedValueOnce(axiosError) // 404 - null rates
+      .mockRejectedValueOnce(axiosError) // 404 - null rates
+      .mockRejectedValueOnce(axiosError) // 404 - null rates
+      .mockRejectedValueOnce(axiosError) // 404 - null rates
+      .mockRejectedValueOnce(axiosError) // 404 - null rates
+      .mockRejectedValueOnce(axiosError) // 404 - null rates
+      .mockRejectedValueOnce(axiosError); // 404 - null rates
+
+    const { result } = renderHook(() =>
+      useExchangeRateData({
+        baseCurrency: 'GBP',
+        targetCurrencies: ['USD'],
+        selectedDate: new Date('2025-11-04'),
+      })
+    );
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    // Should have data even with some null rates
+    expect(result.current.tableData.length).toBeGreaterThan(0);
+  });
+
+  it('handles missing currency in rates data', async () => {
+    // Mock rates that don't include all requested currencies
+    mockedAxios.get.mockResolvedValue({
+      data: { 
+        gbp: {
+          usd: 1.25,
+          // EUR is missing
+        }
+      },
+    });
+
+    const { result } = renderHook(() =>
+      useExchangeRateData({
+        baseCurrency: 'GBP',
+        targetCurrencies: ['USD', 'EUR'],
+        selectedDate: new Date('2025-11-04'),
+      })
+    );
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.tableData.length).toBe(2);
+    const eurRow = result.current.tableData.find(row => row.currency === 'EUR');
+    
+    // EUR should have 'N/A' for the date since it's not in the rates
+    if (eurRow) {
+      const dateKeys = Object.keys(eurRow).filter(key => key !== 'id' && key !== 'currency');
+      expect(eurRow[dateKeys[0]]).toBe('N/A');
+    }
+  });
 });

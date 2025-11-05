@@ -73,6 +73,45 @@ npm run test:coverage
 
 Coverage output will be written to the `coverage/` folder.
 
+### Test Coverage
+
+The project maintains excellent test coverage across all components, hooks, services, and utilities:
+
+```
+---------------------------|---------|----------|---------|---------|-------------------
+File                       | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+---------------------------|---------|----------|---------|---------|-------------------
+All files                  |     100 |    84.05 |     100 |     100 |                  
+ components                |     100 |       90 |     100 |     100 |                  
+  BaseCurrencySelector.tsx |     100 |      100 |     100 |     100 |                  
+  CurrencySelector.tsx     |     100 |    81.25 |     100 |     100 | 27-35            
+  CurrencyTable.tsx        |     100 |      100 |     100 |     100 |                  
+ constants                 |     100 |      100 |     100 |     100 |                  
+  api.ts                   |     100 |      100 |     100 |     100 |                  
+  app.ts                   |     100 |      100 |     100 |     100 |                  
+  index.ts                 |     100 |      100 |     100 |     100 |                  
+ hooks                     |     100 |    83.33 |     100 |     100 |                  
+  useCurrencies.ts         |     100 |       75 |     100 |     100 | 34-35            
+  useExchangeRateData.ts   |     100 |       90 |     100 |     100 | 77,82            
+  useFetchExchangeRates.ts |     100 |       50 |     100 |     100 | 29               
+ services                  |     100 |    66.66 |     100 |     100 |                  
+  currencyService.ts       |     100 |    66.66 |     100 |     100 | 17,47            
+  index.ts                 |     100 |      100 |     100 |     100 |                  
+ utils                     |     100 |    66.66 |     100 |     100 |                  
+  dateHelpers.ts           |     100 |    66.66 |     100 |     100 | 24               
+---------------------------|---------|----------|---------|---------|-------------------
+
+Test Suites: 8 passed, 8 total
+Tests:       102 passed, 102 total
+```
+
+**Summary:**
+- ✅ **100% Statement Coverage**
+- ✅ **100% Function Coverage**
+- ✅ **100% Line Coverage**
+- ✅ **84.05% Branch Coverage**
+- ✅ **102 Tests Passing**
+
 ## Deployment
 
 The app is automatically deployed to GitHub Pages when changes are pushed to the `main` branch. You can also deploy manually:

@@ -11,11 +11,8 @@ export const APP_CONFIG = {
     LOCALE: 'en-GB',
   },
   TABLE: {
-    HEIGHT: 500,
-    COLUMN_WIDTH: {
-      CURRENCY: 130,
-      DATE: 120,
-    },
+    HEIGHT: 425,
+    COLUMN_WIDTH: 130
   },
 } as const;
 

@@ -20,8 +20,10 @@ const CurrencyTable: React.FC<CurrencyTableProps> = ({
             {
                 field: 'currency',
                 headerName: 'Currency',
-                width: APP_CONFIG.TABLE.COLUMN_WIDTH.CURRENCY,
+                width: APP_CONFIG.TABLE.COLUMN_WIDTH,
                 sortable: true,
+                align: 'center',
+                headerAlign: 'center',
             },
         ];
 
@@ -35,7 +37,9 @@ const CurrencyTable: React.FC<CurrencyTableProps> = ({
             cols.push({
                 field: dateKey,
                 headerName: new Date(dateKey).toLocaleDateString(APP_CONFIG.DATE.LOCALE),
-                width: APP_CONFIG.TABLE.COLUMN_WIDTH.DATE,
+                width: APP_CONFIG.TABLE.COLUMN_WIDTH,
+                align: 'center',
+                headerAlign: 'center',
             });
         });
 

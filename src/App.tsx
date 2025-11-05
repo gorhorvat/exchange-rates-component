@@ -3,6 +3,7 @@ import { Provider } from 'react-redux';
 import { Container, Box, Typography, Paper } from '@mui/material';
 import { store } from './store/store';
 import CurrencyExchangeRates from './components/CurrencyExchangeRates';
+import './App.css';
 
 const App: React.FC = () => {
   return (

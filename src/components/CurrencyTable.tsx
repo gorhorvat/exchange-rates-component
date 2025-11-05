@@ -55,11 +55,6 @@ const CurrencyTable: React.FC<CurrencyTableProps> = ({
                     columns={columns}
                     disableRowSelectionOnClick
                     hideFooter
-                    sx={{
-                        '& .MuiDataGrid-cell': {
-                            fontSize: '0.875rem',
-                        },
-                    }}
                 />
             )}
         </Box>

@@ -12,7 +12,7 @@ A small React + TypeScript component that displays historical exchange rates in 
 - Redux Toolkit (@reduxjs/toolkit)
 - react-redux
 - axios
-- MUI (@mui/material, @mui/x-data-grid)
+- [MUI](https://mui.com/) (@mui/material, @mui/x-data-grid)
 - @emotion/react, @emotion/styled
 - date-fns
 - react-day-picker

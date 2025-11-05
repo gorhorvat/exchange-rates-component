@@ -253,7 +253,9 @@ describe('dateHelpers', () => {
         it('getLastSevenDays includes getMaxPastDate range', () => {
             const today = new Date('2025-11-04');
             const lastSevenDays = getLastSevenDays(today);
-            const maxPastDate = getMaxPastDate(90);
+            // Use the same reference "today" as the helper to make this deterministic
+            const maxPastDate = new Date(today);
+            maxPastDate.setDate(maxPastDate.getDate() - 90);
 
             // All dates in last seven days should be after maxPastDate
             lastSevenDays.forEach((date) => {
@@ -264,14 +266,16 @@ describe('dateHelpers', () => {
         it('date from getLastSevenDays[0] is after getMaxPastDate(6)', () => {
             const today = new Date('2025-11-04');
             const lastSevenDays = getLastSevenDays(today);
-            const maxPastDate6 = getMaxPastDate(6);
+
+            // Compute the 6-days-ago date relative to the selected "today" used above
+            const maxPastDate6 = new Date(today);
+            maxPastDate6.setDate(maxPastDate6.getDate() - 6);
 
             // Compare date strings instead of timestamps to avoid time zone issues
             const firstDayString = lastSevenDays[0].toISOString().split('T')[0];
             const maxPastDateString = maxPastDate6.toISOString().split('T')[0];
 
             // lastSevenDays[0] is 6 days before today
-            // maxPastDate(6) is also 6 days before today
             // They should be the same date or firstDay should be after
             const firstDayDate = new Date(firstDayString);
             const maxPastDateDate = new Date(maxPastDateString);

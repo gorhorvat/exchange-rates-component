@@ -1,4 +1,3 @@
-// tests/useExchangeRateData.test.ts
 import { renderHook, waitFor } from '@testing-library/react';
 import useExchangeRateData from '../../hooks/useExchangeRateData';
 import axios from 'axios';

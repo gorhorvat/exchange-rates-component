@@ -1,4 +1,3 @@
-// tests/BaseCurrencySelector.test.tsx
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import BaseCurrencySelector from '../../components/BaseCurrencySelector';
@@ -85,7 +84,7 @@ describe('BaseCurrencySelector', () => {
     });
 
     const select = screen.getByRole('combobox');
-    
+
     // Click to open dropdown
     await user.click(select);
 

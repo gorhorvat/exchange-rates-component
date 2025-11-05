@@ -1,4 +1,3 @@
-// tests/CurrencyTable.test.tsx
 import { render, screen } from '@testing-library/react';
 import CurrencyTable from '../../components/CurrencyTable';
 import { ExchangeRateRow } from '../../types/api.types';

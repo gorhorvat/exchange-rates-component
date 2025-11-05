@@ -36,7 +36,6 @@ describe('CurrencySelector', () => {
       />
     );
 
-    // waitFor automatically wraps in act()
     await waitFor(() => {
       expect(screen.getByRole('combobox')).toBeInTheDocument();
     });
@@ -81,7 +80,6 @@ describe('CurrencySelector', () => {
       const deleteButton = usdChip.querySelector('button');
 
       if (deleteButton) {
-        // userEvent automatically wraps in act()
         await user.click(deleteButton);
         expect(onChangeMock).toHaveBeenCalled();
       }
@@ -201,7 +199,7 @@ describe('CurrencySelector', () => {
     });
 
     const select = screen.getByRole('combobox');
-    await user.click(select); // userEvent handles act() automatically
+    await user.click(select);
 
     const jpyOption = await screen.findByRole('option', { name: /JPY/ });
     await user.click(jpyOption);
@@ -212,7 +210,7 @@ describe('CurrencySelector', () => {
   it('displays error gracefully if API fails', async () => {
     mockedAxios.get.mockRejectedValue(new Error('API Error'));
 
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
 
     render(
       <CurrencySelector
@@ -284,7 +282,7 @@ describe('CurrencySelector', () => {
 
     const options = screen.getAllByRole('option');
     const usdOption = options.find(opt => opt.textContent?.includes('USD'));
-    
+
     expect(usdOption).toBeUndefined();
   });
 

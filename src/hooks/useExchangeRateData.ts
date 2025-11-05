@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import axios, { AxiosError } from 'axios';
-import { ExchangeRateRow, ExchangeRates } from '../types/api.types';
+import { ExchangeRateRow } from '../types/api.types';
 import { getLastSevenDays } from '../utils/dateHelpers';
+import { fetchExchangeRatesForDates } from '../services';
+import { ERROR_MESSAGES } from '../constants';
 
 interface UseExchangeRateDataParams {
     baseCurrency: string;
@@ -15,6 +16,9 @@ interface UseExchangeRateDataReturn {
     error: string | null;
 }
 
+/**
+ * Custom hook for fetching and transforming exchange rate data
+ */
 const useExchangeRateData = ({
     baseCurrency,
     targetCurrencies,
@@ -25,52 +29,32 @@ const useExchangeRateData = ({
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        let isMounted = true;
+
         const fetchHistoricalData = async (): Promise<void> => {
+            if (!baseCurrency || targetCurrencies.length === 0) {
+                return;
+            }
+
             setLoading(true);
             setError(null);
 
             try {
                 const dates = getLastSevenDays(selectedDate);
+                const results = await fetchExchangeRatesForDates(baseCurrency, dates);
 
-                // Fetch rates for all dates. Use allSettled so we can handle 404 (no data) differently
-                const promises = dates.map(async (date) => {
-                    const formattedDate = date.toISOString().split('T')[0];
-                    const url = `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${formattedDate}/v1/currencies/${baseCurrency.toLowerCase()}.json`;
+                // Check if all results are null (no data available)
+                const hasData = results.some((result) => result.rates !== null);
 
-                    const response = await axios.get(url);
-                    const allRates = response.data[baseCurrency.toLowerCase()] as ExchangeRates;
+                if (!isMounted) return;
 
-                    return { date: formattedDate, rates: allRates };
-                });
-
-                const settled = await Promise.allSettled(promises);
-
-                // If any request returned a 404 it means there's no data for that date/base.
-                // Treat that as "no data" (show friendly message in the table) instead of an error alert.
-                const has404 = settled.some((r) => {
-                    if (r.status === 'rejected') {
-                        const reason = r.reason as AxiosError | Error | any;
-                        return reason?.response?.status === 404;
-                    }
-                    return false;
-                });
-
-                if (has404) {
-                    // Show empty table (CurrencyTable will render a friendly "No data" message)
+                if (!hasData) {
                     setTableData([]);
                     setLoading(false);
                     return;
                 }
 
-                // Throw if any non-404 rejections happened
-                const rejected = settled.find((r) => r.status === 'rejected');
-                if (rejected) {
-                    throw (rejected as PromiseRejectedResult).reason;
-                }
-
-                const results = (settled as PromiseFulfilledResult<any>[]).map((s) => s.value);
-
-                // Reorganize data: each row is a currency with rates for each date
+                // Transform data: each row is a currency with rates for each date
                 const rows: ExchangeRateRow[] = targetCurrencies.map((currency, index) => {
                     const row: ExchangeRateRow = {
                         id: `${currency}-${index}`,
@@ -78,28 +62,41 @@ const useExchangeRateData = ({
                     };
 
                     results.forEach(({ date, rates }) => {
-                        const currencyLower = currency.toLowerCase();
-                        const rate = rates[currencyLower];
-
-                        row[date] = rate !== undefined ? rate : 'N/A';
+                        if (rates) {
+                            const currencyLower = currency.toLowerCase();
+                            const rate = rates[currencyLower];
+                            row[date] = rate !== undefined ? rate : 'N/A';
+                        } else {
+                            row[date] = 'N/A';
+                        }
                     });
 
                     return row;
                 });
 
-                setTableData(rows);
+                if (isMounted) {
+                    setTableData(rows);
+                }
             } catch (err) {
-                const errorMessage = err instanceof Error ? err.message : 'Failed to fetch exchange rates';
-                setError(errorMessage);
-                console.error('Hook error:', err);
+                if (isMounted) {
+                    const errorMessage = err instanceof Error
+                        ? err.message
+                        : ERROR_MESSAGES.FETCH_RATES_FAILED;
+                    setError(errorMessage);
+                    console.error('Hook error:', err);
+                }
             } finally {
-                setLoading(false);
+                if (isMounted) {
+                    setLoading(false);
+                }
             }
         };
 
-        if (baseCurrency && targetCurrencies.length > 0) {
-            fetchHistoricalData();
-        }
+        fetchHistoricalData();
+
+        return () => {
+            isMounted = false;
+        };
     }, [baseCurrency, targetCurrencies, selectedDate]);
 
     return { tableData, loading, error };

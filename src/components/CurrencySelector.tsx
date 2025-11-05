@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
     FormControl,
     InputLabel,
@@ -9,35 +9,18 @@ import {
     SelectChangeEvent,
     CircularProgress,
 } from '@mui/material';
-import axios from 'axios';
 import { CurrencySelectorProps } from '../types/currency.types';
-import { CurrencyListResponse } from '../types/api.types';
+import { useCurrencies } from '../hooks/useCurrencies';
+import { APP_CONFIG } from '../constants';
 
 const CurrencySelector: React.FC<CurrencySelectorProps> = ({
     selectedCurrencies,
     onCurrenciesChange,
     baseCurrency,
-    minCurrencies = 3,
-    maxCurrencies = 7,
+    minCurrencies = APP_CONFIG.CURRENCY.MIN_SELECTION,
+    maxCurrencies = APP_CONFIG.CURRENCY.MAX_SELECTION,
 }) => {
-    const [availableCurrencies, setAvailableCurrencies] = useState<CurrencyListResponse>({});
-    const [loading, setLoading] = useState<boolean>(true);
-
-    useEffect(() => {
-        const fetchCurrencies = async (): Promise<void> => {
-            try {
-                const response = await axios.get<CurrencyListResponse>(
-                    'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies.json'
-                );
-                setAvailableCurrencies(response.data);
-            } catch (error) {
-                console.error('Error fetching currencies:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchCurrencies();
-    }, []);
+    const { currencies, loading, error } = useCurrencies();
 
     const handleChange = (event: SelectChangeEvent<string[]>): void => {
         const value = event.target.value;
@@ -53,6 +36,10 @@ const CurrencySelector: React.FC<CurrencySelectorProps> = ({
             onCurrenciesChange(selectedCurrencies.filter((c) => c !== currencyToDelete));
         }
     };
+
+    if (error) {
+        console.error('Failed to load currencies:', error);
+    }
 
     return (
         <Box sx={{ minWidth: 300, marginBottom: 2 }}>
@@ -82,11 +69,11 @@ const CurrencySelector: React.FC<CurrencySelectorProps> = ({
                     {loading ? (
                         <MenuItem disabled>Loading currencies...</MenuItem>
                     ) : (
-                        Object.keys(availableCurrencies)
+                        Object.keys(currencies)
                             .filter((code) => code.toUpperCase() !== baseCurrency.toUpperCase())
                             .map((code) => (
                                 <MenuItem key={code} value={code.toUpperCase()}>
-                                    {code.toUpperCase()} - {availableCurrencies[code]}
+                                    {code.toUpperCase()} - {currencies[code]}
                                 </MenuItem>
                             ))
                     )}

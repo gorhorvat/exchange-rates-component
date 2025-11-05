@@ -11,6 +11,7 @@ import CurrencySelector from './CurrencySelector';
 import DatePicker from './DatePicker';
 import CurrencyTable from './CurrencyTable';
 import useExchangeRateData from '../hooks/useExchangeRateData';
+import { APP_CONFIG } from '../constants';
 
 const CurrencyExchangeRates: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -66,8 +67,8 @@ const CurrencyExchangeRates: React.FC = () => {
                         selectedCurrencies={selectedCurrencies}
                         onCurrenciesChange={handleCurrenciesChange}
                         baseCurrency={baseCurrency}
-                        minCurrencies={3}
-                        maxCurrencies={7}
+                        minCurrencies={APP_CONFIG.CURRENCY.MIN_SELECTION}
+                        maxCurrencies={APP_CONFIG.CURRENCY.MAX_SELECTION}
                     />
                 </Grid>
             </Grid>

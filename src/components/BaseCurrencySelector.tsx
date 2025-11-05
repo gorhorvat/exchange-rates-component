@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
     FormControl,
     InputLabel,
@@ -6,8 +6,7 @@ import {
     MenuItem,
     SelectChangeEvent,
 } from '@mui/material';
-import axios from 'axios';
-import { CurrencyListResponse } from '../types/api.types';
+import { useCurrencies } from '../hooks/useCurrencies';
 
 interface BaseCurrencySelectorProps {
     selectedCurrency: string;
@@ -18,28 +17,15 @@ const BaseCurrencySelector: React.FC<BaseCurrencySelectorProps> = ({
     selectedCurrency,
     onCurrencyChange,
 }) => {
-    const [availableCurrencies, setAvailableCurrencies] = useState<CurrencyListResponse>({});
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchCurrencies = async (): Promise<void> => {
-            try {
-                const response = await axios.get<CurrencyListResponse>(
-                    'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies.json'
-                );
-                setAvailableCurrencies(response.data);
-            } catch (error) {
-                console.error('Error fetching currencies:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchCurrencies();
-    }, []);
+    const { currencies, loading, error } = useCurrencies();
 
     const handleChange = (event: SelectChangeEvent<string>): void => {
         onCurrencyChange(event.target.value.toUpperCase());
     };
+
+    if (error) {
+        console.error('Failed to load currencies:', error);
+    }
 
     return (
         <FormControl fullWidth disabled={loading}>
@@ -51,9 +37,9 @@ const BaseCurrencySelector: React.FC<BaseCurrencySelectorProps> = ({
                 onChange={handleChange}
                 label="Base Currency"
             >
-                {Object.keys(availableCurrencies).map((code) => (
+                {Object.keys(currencies).map((code) => (
                     <MenuItem key={code} value={code.toUpperCase()}>
-                        {code.toUpperCase()} - {availableCurrencies[code]}
+                        {code.toUpperCase()} - {currencies[code]}
                     </MenuItem>
                 ))}
             </Select>

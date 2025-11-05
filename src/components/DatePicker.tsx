@@ -2,11 +2,12 @@ import React from 'react';
 import { Box, TextField } from '@mui/material';
 import { DatePickerProps } from '../types/currency.types';
 import { getMaxPastDate } from '../utils/dateHelpers';
+import { APP_CONFIG } from '../constants';
 
 const DatePickerComponent: React.FC<DatePickerProps> = ({
     selectedDate,
     onDateChange,
-    maxPastDays,
+    maxPastDays = APP_CONFIG.DATE.MAX_PAST_DAYS,
 }) => {
     const maxPastDate = getMaxPastDate(maxPastDays);
     const today = new Date();

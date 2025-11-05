@@ -131,7 +131,4 @@ To deploy locally:
 
 ## Notes
 
-- If tests mock `axios`, ensure any changes to how `axios` is imported remain compatible with `jest.mock('axios')` used in the test suite.
 - The project uses date strings in `YYYY-MM-DD` format for API endpoints.
-
-If you'd like, I can also add a short CONTRIBUTING or DEVELOPMENT section describing linting and commit hooks, or expand the README with screenshots and a live demo link.

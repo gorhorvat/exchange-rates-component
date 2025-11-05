@@ -6,7 +6,7 @@ import { getMaxPastDate } from '../utils/dateHelpers';
 const DatePickerComponent: React.FC<DatePickerProps> = ({
     selectedDate,
     onDateChange,
-    maxPastDays = 90,
+    maxPastDays,
 }) => {
     const maxPastDate = getMaxPastDate(maxPastDays);
     const today = new Date();
